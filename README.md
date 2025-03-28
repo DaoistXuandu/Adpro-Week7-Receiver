@@ -85,5 +85,18 @@ This is the place for you to write reflections:
 ### Mandatory (Subscriber) Reflections
 
 #### Reflection Subscriber-1
+```
+In this tutorial, we used RwLock<> to synchronise the use of Vec of Notifications. Explain why it is necessary for this case, and explain why we do not use Mutex<> instead?
+```
+Synchronization is necessary because multiple threads may need to read and write to the Vec of Notifications at the same time. Without proper synchronization, race conditions could occur, leading to data corruption or unexpected behavior. Since Rust enforces strict memory safety rules, using RwLock<> ensures that multiple readers can access the Vec concurrently while still allowing exclusive write access when needed. This improves performance compared to a simple locking mechanism that blocks all access during every operation.
+
+A Mutex<> could also provide synchronization, but it is not as efficient in scenarios where multiple threads primarily need to read data rather than modify it. With a Mutex<>, even read operations require acquiring the lock, meaning only one thread can access the data at a time. In contrast, RwLock<> allows multiple readers simultaneously but ensures that only one writer can modify the data at any given moment. This makes RwLock<> the better choice when the application involves frequent reads and occasional writes, as is the case with our notification system.
+
+```
+In this tutorial, we used lazy_static external library to define Vec and DashMap as a “static” variable. Compared to Java where we can mutate the content of a static variable via a static function, why did not Rust allow us to do so?
+```
+Rust does not allow direct mutation of static variables because it prioritizes thread safety and memory safety. In Java, a static variable is shared across the entire application and can be modified freely within static functions, but this can lead to concurrency issues such as race conditions and inconsistent state when multiple threads access the variable simultaneously. Java developers must use explicit synchronization techniques like synchronized methods or volatile variables to prevent these issues.
+
+In Rust, static variables have a 'static lifetime, meaning they persist for the entire duration of the program. However, they are immutable by default to prevent accidental data races. If a static variable needs to be modified, Rust requires it to be wrapped in a thread-safe structure like Mutex<>, RwLock<>, or DashMap to ensure safe concurrent access. This design forces developers to think explicitly about synchronization, reducing the risk of unsafe memory access. Using lazy_static! allows safe initialization of complex static variables while still enforcing Rust’s strict concurrency guarantees.
 
 #### Reflection Subscriber-2
